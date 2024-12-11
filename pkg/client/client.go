@@ -76,6 +76,16 @@ func (c *Client) Close() error {
 	return err
 }
 
+// Close the client
+func (c *Client) CloseAsync() error {
+	err := c.Send(&api.DisconnectRequest{})
+	select {
+	case c.stopChan <- true:
+	default:
+	}
+	return err
+}
+
 // Hello func
 func (c *Client) Hello() (*types.HelloResponse, error) {
 	response, err := c.SendAndWaitForResponse(&api.HelloRequest{
